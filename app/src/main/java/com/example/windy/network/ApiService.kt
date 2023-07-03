@@ -1,18 +1,24 @@
 package com.example.windy.network
 
-import com.example.windy.WeatherData
+import com.example.windy.model.WeatherData
+import org.intellij.lang.annotations.Language
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface ApiService{
     @GET("")
-    suspend fun getWeather(): Response<WeatherData>
+    suspend fun getWeather(@Query("lat") latitude:Double,
+                           @Query("lon") longitude:Double,
+                           @Query("lang") language:String,
+                           @Query("unit") unit:String,
+                           @Query("appid") key:String): Response<WeatherData>
 }
 
 object RetrofitHelper{
-    private const val BASE_URL = ""
+    private const val BASE_URL = "https://api.openweathermap.org/data/2.5/onecall"
     val retrofitInstance: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())

@@ -1,6 +1,6 @@
 package com.example.windy.network
 
-import com.example.windy.WeatherData
+import com.example.windy.model.WeatherData
 import retrofit2.Response
 
 class WeatherClient private constructor(): RemoteSource {
@@ -19,8 +19,14 @@ class WeatherClient private constructor(): RemoteSource {
         }
     }
 
-    override suspend fun getWeather(): Response<WeatherData> {
-        return weatherService.getWeather()
+    override suspend fun getWeather(
+        longitude: Double,
+        latitude: Double,
+        language: String,
+        unit: String,
+        key: String
+    ): Response<WeatherData> {
+        return weatherService.getWeather(longitude,latitude,language,unit,key)
     }
 }
 

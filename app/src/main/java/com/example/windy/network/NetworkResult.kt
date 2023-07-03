@@ -1,6 +1,6 @@
 package com.example.windy.network
 
-import com.example.windy.WeatherData
+import com.example.windy.model.WeatherData
 
 sealed class NetworkResult {
     class Success(val data: WeatherData): NetworkResult()

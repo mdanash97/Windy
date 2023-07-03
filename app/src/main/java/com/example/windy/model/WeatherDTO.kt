@@ -1,4 +1,4 @@
-package com.example.windy
+package com.example.windy.model
 
 data class WeatherData(
     val lat: Double,
