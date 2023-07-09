@@ -21,4 +21,4 @@ interface LocationDAO{
 
 
 @Entity("locations")
-data class Location(val name:String,val longitude:Double,val latitude:Double)
+data class Location(@PrimaryKey val name:String,val longitude:Double,val latitude:Double)

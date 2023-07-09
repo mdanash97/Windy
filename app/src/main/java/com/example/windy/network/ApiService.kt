@@ -9,16 +9,16 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface ApiService{
-    @GET("")
+    @GET("onecall")
     suspend fun getWeather(@Query("lat") latitude:Double,
                            @Query("lon") longitude:Double,
                            @Query("lang") language:String,
-                           @Query("unit") unit:String,
+                           @Query("units") unit:String,
                            @Query("appid") key:String): Response<WeatherData>
 }
 
 object RetrofitHelper{
-    private const val BASE_URL = "https://api.openweathermap.org/data/2.5/onecall"
+    private const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
     val retrofitInstance: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())

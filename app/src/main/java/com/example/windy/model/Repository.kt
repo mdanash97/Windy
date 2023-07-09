@@ -27,12 +27,12 @@ class Repository private constructor(private val remoteSource: RemoteSource, pri
     }
 
     override suspend fun getWeather(
-        longitude: Double,
         latitude: Double,
+        longitude: Double,
         language: String,
         unit: String
     ): Response<WeatherData> {
-        return remoteSource.getWeather(longitude,latitude,language,unit)
+        return remoteSource.getWeather(latitude,longitude,language,unit)
     }
 
     override suspend fun getAllLocations(): Flow<List<Location>> {

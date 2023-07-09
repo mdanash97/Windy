@@ -1,5 +1,7 @@
 package com.example.windy.model
 
+import android.os.Parcelable
+
 data class WeatherData(
     val lat: Double,
     val lon: Double,
