@@ -12,10 +12,8 @@ import kotlinx.coroutines.launch
 class HomeViewModel(private val repository: RepositoryInterface) : ViewModel() {
     private var _weatherData: MutableStateFlow<NetworkResult> = MutableStateFlow(NetworkResult.Loading)
     val weatherData: StateFlow<NetworkResult> = _weatherData
-    private var longitude:Double = 0.0
-    private var latitude:Double = 0.0
 
-    init {
+    fun getWeatherData(latitude: Double,longitude: Double){
         viewModelScope.launch {
             val response = repository.getWeather(latitude,longitude)
             if (response.isSuccessful) {
@@ -32,9 +30,5 @@ class HomeViewModel(private val repository: RepositoryInterface) : ViewModel() {
         viewModelScope.launch {
             repository.insertData(location)
         }
-    }
-    fun setLocation(longitude:Double,latitude:Double){
-        this.longitude = longitude
-        this.latitude = latitude
     }
 }

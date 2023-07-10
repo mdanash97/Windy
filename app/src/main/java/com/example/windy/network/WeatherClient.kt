@@ -20,8 +20,8 @@ class WeatherClient private constructor(): RemoteSource {
     }
 
     override suspend fun getWeather(
-        longitude: Double,
         latitude: Double,
+        longitude: Double,
         language: String,
         unit: String,
         key: String

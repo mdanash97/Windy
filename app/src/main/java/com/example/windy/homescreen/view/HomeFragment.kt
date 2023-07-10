@@ -1,13 +1,27 @@
 package com.example.windy.homescreen.view
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.Intent
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.location.Geocoder
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -19,10 +33,12 @@ import com.example.windy.homescreen.viewmodel.HomeViewModelFactory
 import com.example.windy.model.Repository
 import com.example.windy.network.NetworkResult
 import com.example.windy.network.WeatherClient
+import com.google.android.gms.location.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+const val PERMISSION_ID = 44
 
 class HomeFragment : Fragment() {
 
@@ -31,6 +47,11 @@ class HomeFragment : Fragment() {
     lateinit var homeViewModelFactory: HomeViewModelFactory
     lateinit var hourlyWeatherAdaptor: HourlyWeatherAdaptor
     lateinit var dailyWeatherAdaptor: DailyWeatherAdaptor
+
+    lateinit var sharedPreferences: SharedPreferences
+
+    lateinit var mFusedLocationClient: FusedLocationProviderClient
+    lateinit var geocoder: Geocoder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +69,11 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        sharedPreferences = requireContext().getSharedPreferences("MyPreferences", MODE_PRIVATE)
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        geocoder = Geocoder(requireContext(), Locale.getDefault())
+
         homeViewModelFactory = HomeViewModelFactory(Repository.getInstance(WeatherClient.getInstance(),
             ConcreteLocalSource(AppDatabase.getInstance(requireContext()).getLocationDAo())
         ))
@@ -59,16 +85,52 @@ class HomeFragment : Fragment() {
         dailyWeatherAdaptor = DailyWeatherAdaptor {
             println("new day")
         }
+        var longitude = 0.0
+        var latitude = 0.0
 
-        homeViewModel.setLocation(31.2001,29.9187)
+        when(sharedPreferences.getString("Location","Using Map")){
+            "Using GPS" ->{
+                longitude = sharedPreferences.getString("LongitudeGPS","0.0")!!.toDouble()
+                latitude = sharedPreferences.getString("LatitudeGPS","0.0")!!.toDouble()
+            }
+            "Using Map" ->{
+                longitude = sharedPreferences.getString("LongitudeMap","0.0")!!.toDouble()
+                latitude = sharedPreferences.getString("LatitudeMap","0.0")!!.toDouble()
+            }
+        }
+
+        homeViewModel.getWeatherData(longitude,latitude)
+
+        val addresses = geocoder.getFromLocation(latitude, longitude, 4)
+        val city = addresses!![0].adminArea
+        println(addresses[0])
+
 
         lifecycleScope.launch {
             homeViewModel.weatherData.collect{result ->
                 when(result){
-                    NetworkResult.Loading -> println("loading")
-                    is NetworkResult.Error -> println("Error")
+                    NetworkResult.Loading -> {
+                        homeBinding.homeView.visibility = View.GONE
+                        homeBinding.progressBar.visibility = View.VISIBLE
+                        homeBinding.loadingtext.visibility = View.VISIBLE
+                        homeBinding.errorImg.visibility = View.GONE
+                        homeBinding.errorText.visibility = View.GONE
+                    }
+                    is NetworkResult.Error -> {
+                        homeBinding.homeView.visibility = View.GONE
+                        homeBinding.progressBar.visibility = View.GONE
+                        homeBinding.loadingtext.visibility = View.GONE
+                        homeBinding.errorImg.visibility = View.VISIBLE
+                        homeBinding.errorText.visibility = View.VISIBLE
+                    }
                     is NetworkResult.Success -> {
+                        homeBinding.homeView.visibility = View.VISIBLE
+                        homeBinding.progressBar.visibility = View.GONE
+                        homeBinding.loadingtext.visibility = View.GONE
+                        homeBinding.errorImg.visibility = View.GONE
+                        homeBinding.errorText.visibility = View.GONE
                         setData(result)
+                        homeBinding.cityName.text = city
                     }
                 }
             }
@@ -118,5 +180,79 @@ class HomeFragment : Fragment() {
     }
 
 
+    private val mLocationCallback: LocationCallback = object : LocationCallback(){
+        override fun onLocationResult(locationResult: LocationResult) {
+            super.onLocationResult(locationResult)
+            val mLastLocation : Location = locationResult.lastLocation
+            val editor = sharedPreferences.edit()
+            editor.putString("LongitudeGPS",mLastLocation.longitude.toString())
+            editor.putString("LatitudeGPS",mLastLocation.latitude.toString())
+            editor.apply()
+            println(mLastLocation)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getLastLocation()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getLastLocation() {
+        if(checkPermissions()){
+            if(isLocationEnabled()){
+                requestNewLocationData()
+
+            }else{
+                Toast.makeText(requireContext(),"Turn on location", Toast.LENGTH_LONG).show()
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(intent)
+            }
+        }else{
+            requestPermissions()
+        }
+    }
+
+    private fun checkPermissions(): Boolean {
+        var result = false
+        if((ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )== PackageManager.PERMISSION_GRANTED)&&
+            (ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )== PackageManager.PERMISSION_GRANTED)){
+            result = true
+        }
+        return result
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun requestNewLocationData() {
+        val mLocationRequest = LocationRequest()
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+        mLocationRequest.setInterval(0)
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+
+        mFusedLocationClient.requestLocationUpdates(
+            mLocationRequest,mLocationCallback, Looper.myLooper()
+        )
+    }
+
+    private fun requestPermissions() {
+        ActivityCompat.requestPermissions(
+            requireActivity(),
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ),
+            PERMISSION_ID
+        )
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager: LocationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER)
+    }
 
 }

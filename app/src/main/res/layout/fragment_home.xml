@@ -15,48 +15,49 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="0.0"
+        tools:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/cityName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="City Name"
                 android:textAlignment="center"
                 android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:text="City Name" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
                 android:text="Today"
                 android:textAlignment="center"
-                android:textStyle="bold"
-                android:layout_marginTop="6dp"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/dayTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="Day"
-                android:textStyle="bold"
-                android:textSize="16sp"
                 android:textAlignment="center"
-                android:layout_marginTop="8dp"/>
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/imgbackground"
                 android:layout_margin="16dp"
+                android:background="@drawable/imgbackground"
                 android:orientation="vertical">
 
                 <ImageView
@@ -73,24 +74,24 @@
                     android:text="weatherDescription"
                     android:textAlignment="center"
                     android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/temperatureText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:text="temp"
                     android:textAlignment="center"
-                    android:textSize="40sp"
-                    android:layout_marginTop="4dp"/>
+                    android:textSize="40sp" />
 
                 <TextView
                     android:id="@+id/highAndLowTemp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="HighOf LowOf"
-                    android:textSize="16sp"
-                    android:textAlignment="center"/>
+                    android:textAlignment="center"
+                    android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -359,4 +360,50 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="117dp"
+        android:layout_height="105dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
+
+    <TextView
+        android:id="@+id/loadingtext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Loading Data.."
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/progressBar"
+        app:layout_constraintStart_toStartOf="@+id/progressBar"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        tools:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/errorImg"
+        android:layout_width="209dp"
+        android:layout_height="284dp"
+        android:src="@drawable/error"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/errorText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Error, Please Try Agian Later."
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/errorImg"
+        app:layout_constraintStart_toStartOf="@+id/errorImg"
+        app:layout_constraintTop_toBottomOf="@+id/errorImg" />
 </androidx.constraintlayout.widget.ConstraintLayout>
