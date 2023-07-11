@@ -2,6 +2,7 @@ package com.example.windy.database
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import java.io.Serializable
 
 
 @Dao
@@ -19,6 +20,6 @@ interface LocationDAO{
 
 
 
-
 @Entity("locations")
-data class Location(@PrimaryKey val name:String,val longitude:Double,val latitude:Double)
+data class Location(@PrimaryKey(autoGenerate = true)val id:Int=0, val name:String,val longitude:Double,val latitude:Double) :
+    Serializable

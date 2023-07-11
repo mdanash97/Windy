@@ -7,6 +7,8 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import com.example.windy.databinding.ActivityMainBinding
+import com.example.windy.favoritescreen.view.FavoriteFragment
+import com.example.windy.homescreen.view.HomeFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -14,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var mainBinding: ActivityMainBinding
     lateinit var navController: NavController
     lateinit var bottomNavigationView: BottomNavigationView
+    var myVariable = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +28,11 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
 
         NavigationUI.setupWithNavController(bottomNavigationView,navController,false)
+
+        if(intent.getStringExtra("Saved")=="Save") {
+            navController.navigate(R.id.favoriteFragment)
+        }
+
 
     }
 }

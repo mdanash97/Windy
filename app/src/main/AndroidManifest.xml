@@ -20,7 +20,7 @@
         android:theme="@style/Theme.Windy"
         tools:targetApi="31" >
         <activity
-            android:name=".MapActivity"
+            android:name=".mapactivity.view.MapActivity"
             android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"

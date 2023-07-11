@@ -13,9 +13,9 @@ class HomeViewModel(private val repository: RepositoryInterface) : ViewModel() {
     private var _weatherData: MutableStateFlow<NetworkResult> = MutableStateFlow(NetworkResult.Loading)
     val weatherData: StateFlow<NetworkResult> = _weatherData
 
-    fun getWeatherData(latitude: Double,longitude: Double){
+    fun getWeatherData(latitude: Double,longitude: Double,unit:String,lang:String){
         viewModelScope.launch {
-            val response = repository.getWeather(latitude,longitude)
+            val response = repository.getWeather(latitude,longitude,lang,unit)
             if (response.isSuccessful) {
                 response.body()?.let {
                     _weatherData.value = NetworkResult.Success(it)
@@ -26,9 +26,4 @@ class HomeViewModel(private val repository: RepositoryInterface) : ViewModel() {
         }
     }
 
-    fun insertFav(location: Location) {
-        viewModelScope.launch {
-            repository.insertData(location)
-        }
-    }
 }

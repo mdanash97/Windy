@@ -7,6 +7,7 @@ import android.os.Handler
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import com.airbnb.lottie.LottieAnimationView
+import com.example.windy.mapactivity.view.MapActivity
 
 class SplashScreenActivity : AppCompatActivity() {
 
@@ -33,6 +34,11 @@ class SplashScreenActivity : AppCompatActivity() {
                     finish()
                 }
                 "Using GPS" ->{
+                    val intent = Intent(this@SplashScreenActivity, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+                else ->{
                     val intent = Intent(this@SplashScreenActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish()

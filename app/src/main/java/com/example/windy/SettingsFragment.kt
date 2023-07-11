@@ -1,14 +1,16 @@
 package com.example.windy
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
+import androidx.fragment.app.Fragment
 import com.example.windy.databinding.FragmentSettingsBinding
+
 
 class SettingsFragment : Fragment() {
 
@@ -39,19 +41,76 @@ class SettingsFragment : Fragment() {
         }else{
             settingsBinding.usingMapBtn.isChecked = true
         }
+        if(sharedPreferences.getString("Language","en")=="en"){
+            settingsBinding.englsihLang.isChecked = true
+        }else{
+            settingsBinding.arabicLang.isChecked = true
+        }
+        if(sharedPreferences.getString("Unit","metric")=="metric"){
+            settingsBinding.metricUnit.isChecked = true
+        }else{
+            settingsBinding.imperialUnit.isChecked = true
+        }
+        if(sharedPreferences.getString("Alerts","Alert")=="Alert"){
+            settingsBinding.alerts.isChecked = true
+        }else{
+            settingsBinding.notifications.isChecked = true
+        }
         val editor = sharedPreferences.edit()
+
         settingsBinding.locationOptions.setOnCheckedChangeListener { group, checkedId ->
             val checkedButton = group.findViewById<RadioButton>(checkedId)
             when(checkedButton.text){
                 "Using GPS"->{
                     editor.putString("Location","Using GPS")
-                    editor.apply()
                 }
                 "Using Map"->{
                     editor.putString("Location","Using Map")
-                    editor.apply()
                 }
             }
+        }
+        settingsBinding.unitsOptions.setOnCheckedChangeListener { group, checkedId ->
+            val checkedButton = group.findViewById<RadioButton>(checkedId)
+            when(checkedButton.text){
+                "Metric"->{
+                    editor.putString("Unit","metric")
+                }
+                "Imperial"->{
+                    editor.putString("Unit","imperial")
+                }
+            }
+        }
+        settingsBinding.langOptions.setOnCheckedChangeListener { group, checkedId ->
+            val checkedButton = group.findViewById<RadioButton>(checkedId)
+            when(checkedButton.text){
+                "English"->{
+                    editor.putString("Language","en")
+                }
+                "Arabic"->{
+                    editor.putString("Language","ar")
+                }
+            }
+        }
+        settingsBinding.alertsOptions.setOnCheckedChangeListener { group, checkedId ->
+            val checkedButton = group.findViewById<RadioButton>(checkedId)
+            when(checkedButton.text){
+                "Alerts"->{
+                    editor.putString("Alerts","Alerts")
+                }
+                "Notifications"->{
+                    editor.putString("Alerts","Notifications")
+                }
+            }
+        }
+
+        settingsBinding.saveSettings.setOnClickListener {
+            editor.apply()
+            val intent = activity!!.packageManager.getLaunchIntentForPackage(
+                activity!!.packageName
+            )
+            intent!!.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent!!)
         }
     }
 }

@@ -20,7 +20,7 @@ class FavoriteViewModel(private val repository: RepositoryInterface) : ViewModel
         }
     }
 
-    fun deleteProduct(location: Location){
+    fun deleteLocation(location: Location){
         viewModelScope.launch (Dispatchers.IO){
             repository.deleteData(location)
             getSavedLocations()
@@ -30,6 +30,12 @@ class FavoriteViewModel(private val repository: RepositoryInterface) : ViewModel
     private suspend fun getSavedLocations() {
         repository.getAllLocations().collect{
             _locations.value = DatabaseResult.Success(it)
+        }
+    }
+
+    fun insertFav(location: Location) {
+        viewModelScope.launch {
+            repository.insertData(location)
         }
     }
 }

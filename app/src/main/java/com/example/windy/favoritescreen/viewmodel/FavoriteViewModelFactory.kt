@@ -2,7 +2,6 @@ package com.example.windy.favoritescreen.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.windy.homescreen.viewmodel.HomeViewModel
 import com.example.windy.model.RepositoryInterface
 
 class FavoriteViewModelFactory (private val repository: RepositoryInterface) : ViewModelProvider.Factory{

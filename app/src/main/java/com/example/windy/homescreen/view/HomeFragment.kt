@@ -13,13 +13,13 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -49,9 +49,16 @@ class HomeFragment : Fragment() {
     lateinit var dailyWeatherAdaptor: DailyWeatherAdaptor
 
     lateinit var sharedPreferences: SharedPreferences
-
     lateinit var mFusedLocationClient: FusedLocationProviderClient
     lateinit var geocoder: Geocoder
+
+    var city = ""
+    var units = arrayOf("","")
+    var longitude = 0.0
+    var latitude = 0.0
+    var lang = "en"
+    var unit = "metric"
+    var saved:Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,25 +92,37 @@ class HomeFragment : Fragment() {
         dailyWeatherAdaptor = DailyWeatherAdaptor {
             println("new day")
         }
-        var longitude = 0.0
-        var latitude = 0.0
 
-        when(sharedPreferences.getString("Location","Using Map")){
-            "Using GPS" ->{
-                longitude = sharedPreferences.getString("LongitudeGPS","0.0")!!.toDouble()
-                latitude = sharedPreferences.getString("LatitudeGPS","0.0")!!.toDouble()
-            }
-            "Using Map" ->{
+        unit = sharedPreferences.getString("Unit","metric").toString()
+        lang = sharedPreferences.getString("Language","en").toString()
+
+        var location = HomeFragmentArgs.fromBundle(arguments!!).newLocations
+        println(location)
+        if (location != null) {
+                homeViewModel.getWeatherData(location.latitude,location.longitude,unit,lang)
+            val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 4)
+            city = addresses!![0].adminArea
+            saved = false
+        }else{
+            if(sharedPreferences.getString("Location","Using Map")=="Using Map"){
                 longitude = sharedPreferences.getString("LongitudeMap","0.0")!!.toDouble()
                 latitude = sharedPreferences.getString("LatitudeMap","0.0")!!.toDouble()
+                homeViewModel.getWeatherData(latitude,longitude,unit,lang)
+                val addresses = geocoder.getFromLocation(latitude, longitude, 4)
+                city = addresses!![0].adminArea
             }
         }
 
-        homeViewModel.getWeatherData(longitude,latitude)
-
-        val addresses = geocoder.getFromLocation(latitude, longitude, 4)
-        val city = addresses!![0].adminArea
-        println(addresses[0])
+        when(sharedPreferences.getString("Unit","metric")){
+            "metric"->{
+                units[0] = "meter/sec"
+                units[1] = "C"
+            }
+            "imperial"->{
+                units[0] = "miles/hour"
+                units[1] = "K"
+            }
+        }
 
 
         lifecycleScope.launch {
@@ -122,6 +141,7 @@ class HomeFragment : Fragment() {
                         homeBinding.loadingtext.visibility = View.GONE
                         homeBinding.errorImg.visibility = View.VISIBLE
                         homeBinding.errorText.visibility = View.VISIBLE
+                        Toast.makeText(requireContext(),result.message,Toast.LENGTH_LONG)
                     }
                     is NetworkResult.Success -> {
                         homeBinding.homeView.visibility = View.VISIBLE
@@ -160,17 +180,17 @@ class HomeFragment : Fragment() {
         homeBinding.weatherDescription.text = result.data.current.weather[0].description.uppercase()
         hourlyWeatherAdaptor.submitList(result.data.hourly.subList(fromIndex = 0, toIndex = 24))
         homeBinding.weatherDescription.text = result.data.current.weather[0].description.uppercase()
-        homeBinding.temperatureText.text = result.data.current.temp.toString()+"°"
+        homeBinding.temperatureText.text = result.data.current.temp.toString()+"°"+units[1]
         homeBinding.highAndLowTemp.text = "L: "+result.data.daily[0].temp.min.toString()+"°   H: "+result.data.daily[0].temp.max.toString()+"°"
         homeBinding.dayTextView.text = currentDate
         homeBinding.humidityLevel.text = result.data.current.humidity.toString()+"%"
-        homeBinding.windSpeed.text = result.data.current.wind_speed.toString()
+        homeBinding.windSpeed.text = result.data.current.wind_speed.toString()+" "+units[0]
         if(result.data.daily[0].rain.toString()!="null"){
             homeBinding.rainLevel.text = result.data.daily[0].rain.toString()+" mm/h"
         }else{
             homeBinding.rainLevel.text = "0.0 mm/h"
         }
-        homeBinding.feelsLike.text = result.data.current.feels_like.toString()+"°"
+        homeBinding.feelsLike.text = result.data.current.feels_like.toString()+"°"+units[1]
         homeBinding.windDirection.text = result.data.current.wind_deg.toString()+" Degrees"
         homeBinding.clouds.text = result.data.current.clouds.toString()+"%"
         homeBinding.pressure.text = result.data.current.pressure.toString()+" hPa"
@@ -183,12 +203,19 @@ class HomeFragment : Fragment() {
     private val mLocationCallback: LocationCallback = object : LocationCallback(){
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
-            val mLastLocation : Location = locationResult.lastLocation
-            val editor = sharedPreferences.edit()
-            editor.putString("LongitudeGPS",mLastLocation.longitude.toString())
-            editor.putString("LatitudeGPS",mLastLocation.latitude.toString())
-            editor.apply()
+            val mLastLocation: Location? = locationResult.lastLocation
             println(mLastLocation)
+            if(saved){
+                if (sharedPreferences.getString("Location", "Using Map") == "Using GPS") {
+                    if (mLastLocation != null) {
+                        homeViewModel.getWeatherData(mLastLocation.latitude, mLastLocation.longitude,unit,lang)
+                        val addresses =
+                            geocoder.getFromLocation(mLastLocation.latitude, mLastLocation.longitude, 4)
+                        city = addresses!![0].adminArea
+                        println(addresses[0])
+                    }
+                }
+            }
         }
     }
 
