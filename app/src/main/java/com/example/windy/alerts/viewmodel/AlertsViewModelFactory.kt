@@ -1,13 +1,13 @@
-package com.example.windy.mapactivity.viewmodel
+package com.example.windy.alerts.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.windy.model.RepositoryInterface
 
-class MapViewModelFactory(private val repository: RepositoryInterface) : ViewModelProvider.Factory{
+class AlertsViewModelFactory(private val repository: RepositoryInterface) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
-            MapViewModel(repository) as T
+        return if (modelClass.isAssignableFrom(AlertViewModel::class.java)) {
+            AlertViewModel(repository) as T
         } else {
             throw java.lang.IllegalArgumentException("ViewModel Class not found")
         }

@@ -16,7 +16,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var mainBinding: ActivityMainBinding
     lateinit var navController: NavController
     lateinit var bottomNavigationView: BottomNavigationView
-    var myVariable = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,10 +28,13 @@ class MainActivity : AppCompatActivity() {
 
         NavigationUI.setupWithNavController(bottomNavigationView,navController,false)
 
-        if(intent.getStringExtra("Saved")=="Save") {
-            navController.navigate(R.id.favoriteFragment)
+        when(intent.getStringExtra("Saved")){
+            "Save"->{
+                navController.navigate(R.id.favoriteFragment)
+            }
+            "Alert"->{
+                navController.navigate(R.id.alertsFragment)
+            }
         }
-
-
     }
 }

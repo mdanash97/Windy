@@ -1,5 +1,6 @@
 package com.example.windy.model
 
+import com.example.windy.database.Alerts
 import com.example.windy.database.LocalSource
 import com.example.windy.database.Location
 import com.example.windy.network.RemoteSource
@@ -37,5 +38,17 @@ class Repository private constructor(private val remoteSource: RemoteSource, pri
 
     override suspend fun getAllLocations(): Flow<List<Location>> {
         return localSource.getAllLocations()
+    }
+
+    override suspend fun insertAlert(alerts: Alerts) {
+        localSource.insertAlert(alerts)
+    }
+
+    override suspend fun deleteAlert(alerts: Alerts) {
+        localSource.deleteAlert(alerts)
+    }
+
+    override suspend fun getAllAlerts(): Flow<List<Alerts>> {
+        return localSource.getAllAlerts()
     }
 }

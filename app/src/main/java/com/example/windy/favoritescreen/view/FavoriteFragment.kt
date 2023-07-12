@@ -11,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.windy.mapactivity.view.MapActivity
-import com.example.windy.R
 import com.example.windy.database.AppDatabase
 import com.example.windy.database.ConcreteLocalSource
 import com.example.windy.database.DatabaseResult
@@ -49,7 +48,7 @@ class FavoriteFragment : Fragment() ,OnSelect{
         favoriteViewModelFactory = FavoriteViewModelFactory(
             Repository.getInstance(
                 WeatherClient.getInstance(),
-            ConcreteLocalSource(AppDatabase.getInstance(requireContext()).getLocationDAo())
+            ConcreteLocalSource(AppDatabase.getInstance(requireContext()).getLocationDAo(),AppDatabase.getInstance(requireContext()).getAlertsDAo())
             )
         )
         favoriteViewModel = ViewModelProvider(this,favoriteViewModelFactory)[FavoriteViewModel::class.java]
@@ -97,6 +96,9 @@ class FavoriteFragment : Fragment() ,OnSelect{
                         favoriteBinding.emptyImg.visibility = View.VISIBLE
                         favoriteBinding.emptyList.visibility = View.VISIBLE
                         favoriteBinding.emptyList.text = "Something Went Wrong.."
+                    }
+                    else -> {
+
                     }
                 }
             }

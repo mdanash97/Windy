@@ -47,7 +47,6 @@ class HomeFragment : Fragment() {
     lateinit var homeViewModelFactory: HomeViewModelFactory
     lateinit var hourlyWeatherAdaptor: HourlyWeatherAdaptor
     lateinit var dailyWeatherAdaptor: DailyWeatherAdaptor
-
     lateinit var sharedPreferences: SharedPreferences
     lateinit var mFusedLocationClient: FusedLocationProviderClient
     lateinit var geocoder: Geocoder
@@ -82,7 +81,7 @@ class HomeFragment : Fragment() {
         geocoder = Geocoder(requireContext(), Locale.getDefault())
 
         homeViewModelFactory = HomeViewModelFactory(Repository.getInstance(WeatherClient.getInstance(),
-            ConcreteLocalSource(AppDatabase.getInstance(requireContext()).getLocationDAo())
+            ConcreteLocalSource(AppDatabase.getInstance(requireContext()).getLocationDAo(),AppDatabase.getInstance(requireContext()).getAlertsDAo())
         ))
         homeViewModel = ViewModelProvider(this,homeViewModelFactory)[HomeViewModel::class.java]
 
@@ -97,7 +96,6 @@ class HomeFragment : Fragment() {
         lang = sharedPreferences.getString("Language","en").toString()
 
         var location = HomeFragmentArgs.fromBundle(arguments!!).newLocations
-        println(location)
         if (location != null) {
                 homeViewModel.getWeatherData(location.latitude,location.longitude,unit,lang)
             val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 4)
@@ -204,7 +202,6 @@ class HomeFragment : Fragment() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
             val mLastLocation: Location? = locationResult.lastLocation
-            println(mLastLocation)
             if(saved){
                 if (sharedPreferences.getString("Location", "Using Map") == "Using GPS") {
                     if (mLastLocation != null) {
@@ -212,7 +209,6 @@ class HomeFragment : Fragment() {
                         val addresses =
                             geocoder.getFromLocation(mLastLocation.latitude, mLastLocation.longitude, 4)
                         city = addresses!![0].adminArea
-                        println(addresses[0])
                     }
                 }
             }

@@ -6,7 +6,7 @@
     app:startDestination="@id/homeFragment">
     <fragment
         android:id="@+id/alertsFragment"
-        android:name="com.example.windy.AlertsFragment"
+        android:name="com.example.windy.alerts.view.AlertsFragment"
         android:label="fragment_alerts"
         tools:layout="@layout/fragment_alerts" />
     <fragment

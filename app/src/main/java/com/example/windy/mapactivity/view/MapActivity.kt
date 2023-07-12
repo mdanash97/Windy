@@ -15,8 +15,6 @@ import com.example.windy.R
 import com.example.windy.database.AppDatabase
 import com.example.windy.database.ConcreteLocalSource
 import com.example.windy.database.Location
-import com.example.windy.favoritescreen.viewmodel.FavoriteViewModel
-import com.example.windy.favoritescreen.viewmodel.FavoriteViewModelFactory
 import com.example.windy.mapactivity.viewmodel.MapViewModel
 import com.example.windy.mapactivity.viewmodel.MapViewModelFactory
 import com.example.windy.model.Repository
@@ -54,7 +52,7 @@ class MapActivity : AppCompatActivity() ,OnMapReadyCallback{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
 
-        Places.initialize(applicationContext,getString(R.string.myApiKey))
+        Places.initialize(baseContext,getString(R.string.myApiKey))
         autocompleteFragment = supportFragmentManager.findFragmentById(R.id.autoComplete_fragment) as AutocompleteSupportFragment
         autocompleteFragment.setPlaceFields(listOf(Place.Field.ID,Place.Field.ADDRESS,Place.Field.LAT_LNG))
         val mapFragment =  supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -65,7 +63,7 @@ class MapActivity : AppCompatActivity() ,OnMapReadyCallback{
         mapViewModelFactory = MapViewModelFactory(
             Repository.getInstance(
                 WeatherClient.getInstance(),
-                ConcreteLocalSource(AppDatabase.getInstance(this).getLocationDAo())
+                ConcreteLocalSource(AppDatabase.getInstance(this).getLocationDAo(),AppDatabase.getInstance(this).getAlertsDAo())
             )
         )
         mapViewModel = ViewModelProvider(this,mapViewModelFactory)[MapViewModel::class.java]
@@ -108,8 +106,8 @@ class MapActivity : AppCompatActivity() ,OnMapReadyCallback{
                 Toast.makeText(this@MapActivity,"Error in Searching",Toast.LENGTH_LONG).show()
             }
 
-            override fun onPlaceSelected(place: Place) {
-                val latLng = place.latLng
+            override fun onPlaceSelected(p0: Place) {
+                val latLng = p0.latLng
                 googleMap.clear()
                 googleMap.addMarker(MarkerOptions().position(latLng).title(latLng.toString()))
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
@@ -124,7 +122,7 @@ class MapActivity : AppCompatActivity() ,OnMapReadyCallback{
         var longitudeMap = sharedPreferences.getString("LongitudeMap","0.0")!!.toDouble()
         var latitudeMap = sharedPreferences.getString("LatitudeMap","0.0")!!.toDouble()
         var alex = LatLng(latitudeMap,longitudeMap)
-        googleMap.addMarker(MarkerOptions().position(alex).title("Alexandria"))
+        googleMap.addMarker(MarkerOptions().position(alex).title("Your Location"))
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(alex, 8f))
 
         googleMap.setOnMapClickListener {
