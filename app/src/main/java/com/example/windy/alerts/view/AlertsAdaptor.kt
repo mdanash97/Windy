@@ -42,7 +42,7 @@ class AlertsAdaptor(private val onClick : (Alerts) -> Unit) : ListAdapter<Alerts
     override fun onBindViewHolder(holder: AlertsViewHolder, position: Int) {
         val currentObj = getItem(position)
         val date = Date(currentObj.time)
-        val simpleDate = SimpleDateFormat("dd/MM/yyyy KK:mm:ss aaa")
+        val simpleDate = SimpleDateFormat("dd/MM/yyyy KK:mm aaa")
         val currentDate = simpleDate.format(date)
         holder.holderBinding.alertTime.text = currentDate
         holder.holderBinding.alertTitle.text = currentObj.title

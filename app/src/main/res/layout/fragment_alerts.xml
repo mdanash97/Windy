@@ -20,6 +20,29 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.029" />
 
+    <TextView
+        android:id="@+id/emptyList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="List is Empty"
+        android:textSize="20sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/emptyImg"
+        android:layout_width="175dp"
+        android:layout_height="150dp"
+        android:src="@drawable/emptyfolder"
+        app:layout_constraintBottom_toTopOf="@+id/emptyList"
+        app:layout_constraintEnd_toEndOf="@+id/emptyList"
+        app:layout_constraintStart_toStartOf="@+id/emptyList"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.899" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addAlertBtn"
         android:layout_width="wrap_content"

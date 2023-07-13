@@ -74,15 +74,24 @@ class AlertsFragment : Fragment() {
             alertViewModel.alerts.collect { result ->
                 when (result) {
                     is DatabaseResult.Loading -> {
-
+                        alertsBinding.emptyImg.visibility = View.GONE
+                        alertsBinding.emptyList.visibility = View.GONE
+                        alertsBinding.alersRV.visibility = View.GONE
                     }
                     is DatabaseResult.Success -> {
-
                     }
                     is DatabaseResult.Error -> {
-
                     }
                     is DatabaseResult.SuccessAlerts -> {
+                        if(result.data.isEmpty()){
+                            alertsBinding.alersRV.visibility = View.GONE
+                            alertsBinding.emptyImg.visibility = View.VISIBLE
+                            alertsBinding.emptyList.visibility = View.VISIBLE
+                        }else{
+                            alertsBinding.alersRV.visibility = View.VISIBLE
+                            alertsBinding.emptyImg.visibility = View.GONE
+                            alertsBinding.emptyList.visibility = View.GONE
+                        }
                         alertsAdaptor.submitList(result.data)
                     }
                 }
