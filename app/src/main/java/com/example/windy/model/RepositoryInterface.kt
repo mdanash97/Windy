@@ -13,6 +13,4 @@ interface RepositoryInterface {
     suspend fun insertAlert(alerts: Alerts)
     suspend fun deleteAlert(alerts: Alerts)
     suspend fun getAllAlerts() : Flow<List<Alerts>>
-
-
 }

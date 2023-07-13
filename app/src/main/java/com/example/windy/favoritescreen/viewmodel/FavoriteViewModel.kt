@@ -33,9 +33,4 @@ class FavoriteViewModel(private val repository: RepositoryInterface) : ViewModel
         }
     }
 
-    fun insertFav(location: Location) {
-        viewModelScope.launch {
-            repository.insertData(location)
-        }
-    }
 }
